@@ -1,0 +1,22 @@
+query PeopleDetails($id: ID!){
+    person(id: $id) {
+        name
+        species {
+            name
+        }
+        homeworld {
+            name
+        }
+        eyeColor
+        hairColor
+        skinColor
+        birthYear
+        vehicleConnection {
+            edges {
+                node {
+                    name
+                }
+            }
+        }
+    }
+}

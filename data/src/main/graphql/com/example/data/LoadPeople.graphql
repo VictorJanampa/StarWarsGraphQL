@@ -1,0 +1,14 @@
+query LoadPeople{
+  allPeople {
+    people {
+      id
+      name
+      species {
+        name
+      }
+      homeworld {
+        name
+      }
+    }
+  }
+}
