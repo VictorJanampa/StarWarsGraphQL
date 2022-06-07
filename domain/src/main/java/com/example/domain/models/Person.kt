@@ -1,4 +1,4 @@
-package com.example.data.models
+package com.example.domain.models
 
 data class Person(
     val id: String,

@@ -75,5 +75,4 @@ dependencies {
 }
 apollo {
     packageName.set("com.example.starwarsgraphql")
-    schemaFile.set(file("../../schema.graphqls"))
 }

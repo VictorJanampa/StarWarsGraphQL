@@ -53,5 +53,5 @@ apollo {
     generateKotlinModels.set(true)
     generateApolloMetadata.set(true)
     packageName.set("com.example.data")
-    schemaFile.set(file("../../schema.graphqls"))
+    schemaFile.set(file("../schema.graphqls"))
 }

@@ -3,27 +3,32 @@ package com.example.data.repository
 import android.util.Log
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.exception.ApolloException
-import com.example.LoadPeopleQuery
-import com.example.data.models.Person
+import com.example.data.LoadPeopleQuery
+import com.example.domain.models.Person
 import com.example.data.models.PersonMapper
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class PeopleRepository(apolloClient: ApolloClient) {
+@Singleton
+class PeopleRepository @Inject constructor(private val apolloClient: ApolloClient) {
 
-    fun getAllPeople(apolloClient: ApolloClient): List<Person> {
-        var people: List<Person> = emptyList()
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun getAllPeople(): List<Person> {
+        var people: List<Person>
+        withContext(Dispatchers.IO) {
             val response = try {
+                Log.i("Andrio", "Success Query")
                 apolloClient.query(LoadPeopleQuery()).execute()
             } catch (e: ApolloException) {
-                Log.i("onGetAllPeople", e.message ?: "null")
+                Log.i("Andrio", e.message ?: "null")
                 null
             }
-            people = response?.data?.allPeople?.people?.filterNotNull()?.map { PersonMapper.toPerson(it) }
-                ?: emptyList()
+            people = response?.data?.allPeople?.people?.filterNotNull()?.map {
+                PersonMapper.toPersonDomainModel(it)
+            } ?: emptyList()
         }
+        println("Andrio :$people")
         return people
     }
 }
