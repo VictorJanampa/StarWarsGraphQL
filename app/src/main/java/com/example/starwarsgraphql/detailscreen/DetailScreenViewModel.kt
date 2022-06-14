@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.PeopleRepositoryImpl
 import com.example.domain.models.PersonDetails
+import com.example.domain.usecases.GetPersonDetailsUseCase
+import com.example.domain.usecases.GetPersonDetailsUseCaseImpl
 import com.example.starwarsgraphql.common.LoadingState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,12 +15,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailScreenViewModel @Inject constructor(
-    private val repository: PeopleRepositoryImpl,
+    private val getPersonDetailsUseCase: GetPersonDetailsUseCaseImpl,
     savedStateHandle: SavedStateHandle
     ) : ViewModel() {
     private val personId: String? = savedStateHandle.get<String>("personId")
-    private var loadingState: MutableStateFlow<LoadingState> = MutableStateFlow(LoadingState.LOADING)
-    private var person: MutableStateFlow<PersonDetails> = MutableStateFlow(PersonDetails(
+    private val loadingState: MutableStateFlow<LoadingState> = MutableStateFlow(LoadingState.LOADING)
+    private val person: MutableStateFlow<PersonDetails> = MutableStateFlow(PersonDetails(
         name = "",
         hairColor = "",
         eyeColor = "",
@@ -33,7 +35,7 @@ class DetailScreenViewModel @Inject constructor(
 
     private fun getPersonDetails(id: String){
         viewModelScope.launch {
-            person.value = repository.getDetailsPerson(id).apply {
+            person.value = getPersonDetailsUseCase.invoke(id).apply {
                 if(this.name == "") loadingState.value = LoadingState.ERROR
                 else loadingState.value = LoadingState.COMPLETED
             }
