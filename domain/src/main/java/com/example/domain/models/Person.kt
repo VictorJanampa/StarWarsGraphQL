@@ -5,4 +5,5 @@ data class Person(
     val name: String,
     val species: String,
     val homeworldName: String,
+    var isFavorite: Boolean
 )

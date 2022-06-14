@@ -1,21 +1,41 @@
 package com.example.data.repository
 
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.exception.ApolloException
 import com.example.data.LoadPeopleQuery
 import com.example.data.PeopleDetailsQuery
+import com.example.data.database.PeopleDatabaseDao
 import com.example.domain.models.Person
 import com.example.data.models.PersonMapper
+import com.example.data.paging.PeopleRemoteMediator
 import com.example.domain.models.PersonDetails
 import com.example.domain.repository.PeopleRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class PeopleRepositoryImpl @Inject constructor(private val apolloClient: ApolloClient) :
+@OptIn(ExperimentalPagingApi::class)
+class PeopleRepositoryImpl @Inject constructor(
+    private val apolloClient: ApolloClient,
+    private val database: PeopleDatabaseDao,
+    private val remoteMediator: PeopleRemoteMediator
+    ) :
     PeopleRepository {
+    override fun <T : Any> getPagingData(): Flow<PagingData<T>> {
+        val pagingSourceFactory = { database.getAllPeople()}
+        return Pager(
+            config = PagingConfig(pageSize = 5, enablePlaceholders = false),
+            remoteMediator = remoteMediator,
+            pagingSourceFactory = pagingSourceFactory
+        ).flow as Flow<PagingData<T>>
+    }
 
     override suspend fun getAllPeople(): List<Person> {
         var people: List<Person>
@@ -32,6 +52,8 @@ class PeopleRepositoryImpl @Inject constructor(private val apolloClient: ApolloC
         return people
     }
 
+
+
     override suspend fun getDetailsPerson(id: String): PersonDetails {
         var personDetails: PersonDetails
         withContext(Dispatchers.IO) {
@@ -45,9 +67,10 @@ class PeopleRepositoryImpl @Inject constructor(private val apolloClient: ApolloC
         return personDetails
     }
 
-
-    fun insertPeople(personList: List<Person>) {
-        TODO("Not yet implemented")
+    override suspend fun updatePerson(person: Person) {
+        val updatedPerson = PersonMapper.toPersonRoomModel(person.copy(isFavorite = !person.isFavorite))
+        withContext(Dispatchers.IO){
+            database.updatePerson(updatedPerson)
+        }
     }
-
 }

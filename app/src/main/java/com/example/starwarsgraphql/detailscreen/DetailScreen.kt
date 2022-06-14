@@ -1,16 +1,13 @@
 package com.example.starwarsgraphql.detailscreen
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.data.type.Vehicle
 import com.example.domain.models.PersonDetails
+import com.example.starwarsgraphql.common.LoadingState
 import com.example.starwarsgraphql.composables.*
-import com.example.starwarsgraphql.peoplescreen.PeopleList
-import com.example.starwarsgraphql.peoplescreen.PeopleScreenViewModel
 
 @Composable
 fun DetailScreen(
@@ -51,7 +48,8 @@ fun PersonData(person: PersonDetails) {
         if (person.vehicles != null) {
             Column{
                 SectionHeader(title = "Vehicles")
-                person.vehicles?.forEach { vehicle -> vehicle?.let { VehicleCell(it) } }
+                if (person.vehicles.isNullOrEmpty()) VehicleCell("No vehicles")
+                else person.vehicles?.forEach { vehicle -> vehicle?.let { VehicleCell(it) } }
             }
         }
     }

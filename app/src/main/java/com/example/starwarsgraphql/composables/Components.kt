@@ -1,17 +1,15 @@
 package com.example.starwarsgraphql.composables
 
-import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.animation.graphics.res.animatedVectorResource
-import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
-import androidx.compose.animation.graphics.vector.AnimatedImageVector
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.starwarsgraphql.R
@@ -27,6 +26,7 @@ import com.example.starwarsgraphql.ui.theme.StarWarsGraphQLTheme
 import com.example.starwarsgraphql.ui.theme.TextLight
 import com.example.starwarsgraphql.ui.theme.padding
 import com.example.starwarsgraphql.ui.theme.ravnTypography
+import com.google.accompanist.swiperefresh.SwipeRefreshState
 
 @Composable
 fun TopBar(title: String) {
@@ -69,39 +69,52 @@ fun PersonCell(
     name: String,
     species: String,
     homeworld: String,
-    modifier: Modifier
+    isFavorite: Boolean,
+    onFavoritePressed: () -> Unit,
+    onNavigatePressed: () -> Unit,
 ) {
     Column {
         Row (
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(MaterialTheme.padding.medium)
         ){
             Column (
-                modifier = Modifier
             ) {
                 Text(
                     text = name,
                     style = MaterialTheme.ravnTypography.h2Default,
                     textAlign = TextAlign.Start,
-                    modifier = Modifier
-
                 )
                 Text(
                     text = "$species from $homeworld",
                     style = MaterialTheme.ravnTypography.p1LowEmphasis,
                     textAlign = TextAlign.Start,
-                    modifier = Modifier
-
                 )
             }
-            Icon(
-                imageVector = Icons.Filled.ArrowForward,
-                contentDescription = "Arrow Forward",
-                tint = MaterialTheme.colors.primary,
-            )
+            Row {
+                IconButton(
+                    onClick = { onFavoritePressed() },
+                ) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        contentDescription = "Favorite button",
+                        tint = MaterialTheme.colors.primary,
+                    )
+                }
+                IconButton(
+                    onClick = { onNavigatePressed() },
+                ){
+                    Icon(
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = "Arrow Forward",
+                        tint = MaterialTheme.colors.primary,
+                    )
+                }
+            }
+
         }
         Divider(
             color = TextLight,
@@ -190,29 +203,36 @@ fun VehicleCell(
 
 @Composable
 fun LoadingCell() {
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
+    Surface(
+        elevation = 4.dp
     ) {
-        Icon(
-            painterResource(R.drawable.spinner),
-            contentDescription = "",
-            tint = TextLight,
-            modifier = Modifier.size(
-                 24.dp
-            )
-        )
-        Text(
-            text = "Loading",
-            style = MaterialTheme.ravnTypography.h2LowEmphasis,
-            textAlign = TextAlign.Center,
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(
-                    horizontal = MaterialTheme.padding.small,
-                    vertical = MaterialTheme.padding.medium
+                .fillMaxWidth()
+                .background(color = Color.White)
+
+        ) {
+            Icon(
+                painterResource(R.drawable.spinner),
+                contentDescription = "",
+                tint = TextLight,
+                modifier = Modifier.size(
+                    24.dp
                 )
-        )
+            )
+            Text(
+                text = "Loading",
+                style = MaterialTheme.ravnTypography.h2LowEmphasis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(
+                        horizontal = MaterialTheme.padding.small,
+                        vertical = MaterialTheme.padding.medium
+                    )
+            )
+        }
     }
 }
 
@@ -248,7 +268,9 @@ fun PersonCellPreview() {
             "Luke Skywalker",
             "Human",
             "Tatooine",
-            Modifier
+            true,
+            {},
+            {}
         )
     }
 }

@@ -54,7 +54,7 @@ dependencies {
     implementation project(":data")
     implementation project(":domain")
 
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
@@ -73,6 +73,14 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    // Paging 3
+    implementation "androidx.paging:paging-runtime:$paging_version"
+    implementation "androidx.paging:paging-compose:1.0.0-alpha15"
+    // SwipeToRefresh
+    implementation("com.google.accompanist:accompanist-pager:0.23.1")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.23.1")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.23.1")
+
 }
 apollo {
     packageName.set("com.example.starwarsgraphql")

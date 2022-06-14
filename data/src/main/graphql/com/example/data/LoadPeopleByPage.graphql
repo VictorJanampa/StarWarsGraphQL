@@ -1,0 +1,18 @@
+query LoadPeopleByPage($after: String, $first: Int){
+    allPeople(after: $after, first: $first) {
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+        people {
+            id
+            name
+            species {
+                name
+            }
+            homeworld {
+                name
+            }
+        }
+    }
+}
